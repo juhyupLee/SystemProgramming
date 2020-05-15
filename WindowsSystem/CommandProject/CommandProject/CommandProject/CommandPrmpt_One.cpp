@@ -53,9 +53,22 @@ int CmdProcessing(void)
 	{
 		return true;
 	}
-	else if (!_tcscmp(cmdTokenList[0], _T("추가 되는 명려어1")))
+	else if (!_tcscmp(cmdTokenList[0], _T("notepad.exe")))
 	{
-	
+		STARTUPINFO si = { 0, };
+		PROCESS_INFORMATION pi = { 0 };
+		si.cb = sizeof(si);
+
+		TCHAR processName[] = _T("notepad.exe");
+		BOOL state =CreateProcess(_T("notepad.exe"), NULL, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi);
+		if (!state)
+		{
+			_fputts(_T("Fail\n"), stdout);
+		}
+		else
+		{
+
+		}
 	}
 	else if (!_tcscmp(cmdTokenList[0], _T("추가 되는 명려어2")))
 	{
