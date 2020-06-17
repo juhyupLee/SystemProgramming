@@ -60,19 +60,40 @@ int CmdProcessing(void)
 		si.cb = sizeof(si);
 
 		TCHAR processName[] = _T("notepad.exe");
-		BOOL state =CreateProcess(_T("notepad.exe"), NULL, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi);
+		BOOL state =CreateProcess(NULL, processName, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi);
 		if (!state)
 		{
 			_fputts(_T("Fail\n"), stdout);
 		}
 		else
 		{
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
 
 		}
 	}
-	else if (!_tcscmp(cmdTokenList[0], _T("추가 되는 명려어2")))
+	else if (!_tcscmp(cmdTokenList[0], _T("start")))
 	{
-		
+		//if (cmdTokenList[1] != NULL)
+		//{
+		//	TCHAR temp[]
+		//}
+		STARTUPINFO si = { 0, };
+		PROCESS_INFORMATION pi = { 0 };
+		si.cb = sizeof(si);
+		TCHAR processName[1000]=_T("cmd.exe /k");
+		_tcscat(processName, _T(" "));
+		_tcscat(processName, cmdTokenList[1]);
+		_tcscat(processName, _T(" "));
+		TCHAR optionStr[1000] = _T("");
+		for (int i = 2; i < tokenNum; ++i)
+		{
+			_tcscat(optionStr, cmdTokenList[i]);
+			_tcscat(optionStr, _T(" "));
+		}
+		_tcscat(processName, optionStr);
+	
+		BOOL state = CreateProcess(NULL, processName, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
 	}
 	else
 	{
