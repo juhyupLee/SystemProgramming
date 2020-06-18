@@ -4,7 +4,7 @@
 #include <tchar.h>
 #include <locale.h>
 #include <Windows.h>
-
+#include <TlHelp32.h>
 #define STR_LEN 256
 #define CMD_TOKEN_NUM 10
 
@@ -14,6 +14,9 @@ TCHAR ERROR_CMD[]
 
 int CmdProcessing(void);
 TCHAR* StrLower(TCHAR*);
+void PrintProcessList();
+int SearchProcessID(const TCHAR* process);
+
 
 int _tmain(int argc, TCHAR* argv[])
 {
@@ -82,18 +85,51 @@ int CmdProcessing(void)
 		PROCESS_INFORMATION pi = { 0 };
 		si.cb = sizeof(si);
 		TCHAR processName[1000]=_T("cmd.exe /k");
-		_tcscat(processName, _T(" "));
-		_tcscat(processName, cmdTokenList[1]);
-		_tcscat(processName, _T(" "));
+
 		TCHAR optionStr[1000] = _T("");
 		for (int i = 2; i < tokenNum; ++i)
 		{
-			_tcscat(optionStr, cmdTokenList[i]);
-			_tcscat(optionStr, _T(" "));
+			_stprintf(optionStr, _T("%s %s"), optionStr, cmdTokenList[i]);
 		}
-		_tcscat(processName, optionStr);
+
+		_stprintf(processName, _T("%s %s %s"),processName,cmdTokenList[1], optionStr);
 	
 		BOOL state = CreateProcess(NULL, processName, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+
+	}
+	else if (!_tcscmp(cmdTokenList[0], _T("lp")))
+	{
+		PrintProcessList();
+	}
+	else if (!_tcscmp(cmdTokenList[0], _T("kp")))
+	{
+		if (tokenNum ==1)
+		{
+			_tprintf(_T("프로세스를 입력하지 않았습니다\n"));
+			return 0;
+		}
+
+		DWORD processID = SearchProcessID(cmdTokenList[1]);
+		if (processID == -1)
+		{
+			_tprintf(_T("해당 프로세스는 없습니다\n"));
+			return 0;
+		}
+
+		HANDLE psHandle; 
+		
+		psHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+
+		if (psHandle == NULL)
+		{
+			_tprintf(_T("해당 핸들을 찾지 못하였습니다"));
+			return 0;
+		}
+
+		TerminateProcess(psHandle, 0);
+
 	}
 	else
 	{
@@ -105,6 +141,64 @@ int CmdProcessing(void)
 
 }
 
+void PrintProcessList()
+{
+	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hProcessSnap == INVALID_HANDLE_VALUE)
+	{
+		_tprintf(_T("CreateToolHelp32Snapshot Error!\n"));
+		return;
+	}
+	PROCESSENTRY32 pe32;
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+
+	if (!Process32First(hProcessSnap, &pe32))
+	{
+		_tprintf(_T("Process32First error!\n"));
+		CloseHandle(hProcessSnap);
+		return ;
+	}
+	do
+	{
+		_tprintf(_T("%25s %5d\n"), pe32.szExeFile, pe32.th32ProcessID);
+	} while (Process32Next(hProcessSnap, &pe32));
+
+	CloseHandle(hProcessSnap);
+
+}
+
+int SearchProcessID(const TCHAR* process)
+{
+	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hProcessSnap == INVALID_HANDLE_VALUE)
+	{
+		_tprintf(_T("CreateToolHelp32Snapshot Error!\n"));
+		return -1;
+	}
+	PROCESSENTRY32 pe32;
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+
+	if (!Process32First(hProcessSnap, &pe32))
+	{
+		_tprintf(_T("Process32First error!\n"));
+		CloseHandle(hProcessSnap);
+		return -1;
+	}
+	do
+	{
+		if (!_tcscmp(process, pe32.szExeFile))
+		{
+			CloseHandle(hProcessSnap);
+			return pe32.th32ProcessID;
+			
+		}
+	} while (Process32Next(hProcessSnap, &pe32));
+
+	CloseHandle(hProcessSnap);
+
+	// Search Fail 
+	return -1;
+}
 TCHAR* StrLower(TCHAR* pStr)
 {
 	TCHAR* ret = pStr;
