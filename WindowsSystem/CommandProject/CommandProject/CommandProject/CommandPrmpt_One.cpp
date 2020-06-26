@@ -131,6 +131,83 @@ int CmdProcessing(void)
 		TerminateProcess(psHandle, 0);
 
 	}
+	else if (!_tcscmp(cmdTokenList[0], _T("sort")))
+	{
+		if (tokenNum >1)
+		{
+			// Token 리다이렉션 기능을 사용자가 썻는지 체크
+			// 결과물을 리다이렉션한 파일에 출력한다.
+
+			if (!_tcscmp(cmdTokenList[1], _T(">")))
+			{
+				STARTUPINFO si = { 0 };
+				si.cb = sizeof(si);
+				PROCESS_INFORMATION pi;
+				SECURITY_ATTRIBUTES fileSec = { 0 };
+				fileSec.bInheritHandle = TRUE;
+				
+				TCHAR fileName[1024] = _T("");
+				_tcscpy(fileName, cmdTokenList[2]);
+
+
+				HANDLE hFile = CreateFile(fileName, GENERIC_WRITE, FILE_SHARE_READ,
+					&fileSec, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+				si.hStdOutput = hFile;
+				si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+				si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+				si.dwFlags |= STARTF_USESTDHANDLES;
+
+				TCHAR processName[1024] = _T("CommandProject");
+
+				 CreateProcess(NULL,cmdTokenList[0],NULL,NULL,
+					TRUE, 0, NULL, NULL, &si, &pi);
+
+				
+			}
+			else if(!_tcscmp(cmdTokenList[1], _T("<")))
+			return 0;
+		}
+		else
+		{
+			// 리다이렉션은안하고 그냥 sort 기능만
+			TCHAR buf[100][1024];
+			TCHAR printBuf[102] = _T("");
+
+			int bufCount = 0;
+			for (int i = 0; i < 100; ++i)
+			{
+				if (_fgetts(buf[i], 1024, stdin) == NULL)
+				{
+					bufCount = i;
+					break;
+				}
+			}
+
+			for (int i = bufCount; i>=1; --i)
+			{
+				for (int j = 0; j+1 < i; ++j)
+				{
+					if (_tcscmp(buf[j], buf[j + 1]) > 0)
+					{
+						TCHAR tempBuf[1024];
+						_tcscpy(tempBuf, buf[j]);
+						_tcscpy(buf[j], buf[j + 1]);
+						_tcscpy(buf[j+1], tempBuf);
+
+					}
+				}
+			}
+
+			for (int i = 0; i < bufCount; ++i)
+			{
+				_fputts(buf[i], stdout);
+			}
+	
+			
+			
+		}
+	}
 	else
 	{
 		_tprintf(ERROR_CMD, cmdTokenList[0]);
