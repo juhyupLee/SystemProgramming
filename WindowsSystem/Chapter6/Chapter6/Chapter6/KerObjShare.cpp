@@ -14,7 +14,8 @@ int _tmain(int argc, TCHAR* argv[])
 	CreateProcess(NULL, command, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
 	
 	DWORD timing = 0;
-
+	TCHAR buf[255];
+	GetCurrentDirectory(255, buf);
 	while (1)
 	{
 		for (DWORD i = 0; i < 10000; i++)

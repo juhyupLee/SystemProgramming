@@ -11,58 +11,61 @@ int PageFaultExceptionFilter(DWORD);
 
 int _tmain(int argc, TCHAR* argv[])
 {
-	LPVOID baseAddr;
-	int* lpPtr;
-	SYSTEM_INFO sSysInfo;
+		LPVOID baseAddr;
+		int* lpPtr;
+		SYSTEM_INFO sSysInfo;
 
-	GetSystemInfo(&sSysInfo);
-	pageSize = sSysInfo.dwPageSize; // 페이지 사이즈획득
+		GetSystemInfo(&sSysInfo);
+		pageSize = sSysInfo.dwPageSize; // 페이지 사이즈획득
 
-	// MAX_PAGE의 개수만큼 페이지 RESERVE
-	baseAddr = VirtualAlloc(
-		NULL, //임의주소 할당
-		MAX_PAGE * pageSize,
-		MEM_RESERVE,
-		PAGE_NOACCESS);
+		// MAX_PAGE의 개수만큼 페이지 RESERVE
+		baseAddr = VirtualAlloc(
+			NULL, //임의주소 할당
+			MAX_PAGE * pageSize,
+			MEM_RESERVE,
+			PAGE_NOACCESS);
 
-	if (baseAddr == NULL)
-	{
-		_tprintf(_T("VirtualAlloc reserve failed"));
-	}
+
+		if (baseAddr == NULL)
+		{
+			_tprintf(_T("VirtualAlloc reserve failed"));
+		}
+
+		lpPtr = (int*)baseAddr;
+		nextPageAddr = (int*)baseAddr;
+
+		for (int i = 0; i < (MAX_PAGE * pageSize) / sizeof(int); ++i)
+		{
+			__try
+			{
+				lpPtr[i] = i;
+			}
+			__except (PageFaultExceptionFilter(GetExceptionCode()))
+			{
+				ExitProcess(GetLastError());
+				//예외처리 문제 발생시 종료
+			}
+		}
+
+		for (int i = 0; i < (MAX_PAGE * pageSize) / sizeof(int); ++i)
+		{
+			_tprintf(_T("Array %d\n"), lpPtr[i]);
+		}
+		BOOL isSuccess = VirtualFree(
+			baseAddr,
+			0,
+			MEM_RELEASE); // Free 상태로 변경
+
+		if (isSuccess)
+		{
+			_tprintf(_T("Release succeeded!"));
+		}
+		else
+		{
+			_tprintf(_T("Release failed!"));
+		}
 	
-	lpPtr = (int*)baseAddr;
-	nextPageAddr = (int*)baseAddr;
 
-	for (int i = 0; i < (MAX_PAGE * pageSize) / sizeof(int); ++i)
-	{
-		__try
-		{
-			lpPtr[i] = i;
-		}
-		__except (PageFaultExceptionFilter(GetExceptionCode()))
-		{
-			ExitProcess(GetLastError());
-			//예외처리 문제 발생시 종료
-		}
-	}
-
-	for (int i = 0; i < (MAX_PAGE * pageSize) / sizeof(int); ++i)
-	{
-		_tprintf(_T("Array %d\n"), lpPtr[i]);
-	}
-	BOOL isSuccess = VirtualFree(
-		baseAddr,
-		0,
-		MEM_RELEASE); // Free 상태로 변경
-
-	if (isSuccess)
-	{
-		_tprintf(_T("Release succeeded!"));
-	}
-	else
-	{
-		_tprintf(_T("Release failed!"));
-	}
 }
 
 int PageFaultExceptionFilter(DWORD exptCode)

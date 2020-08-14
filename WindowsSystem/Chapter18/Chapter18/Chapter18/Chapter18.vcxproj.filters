@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Set_Get_FileAttribute.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="UNICODE_BASE_FILE_IO.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -28,6 +25,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="GetFileSize.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Set_Get_FileAttributes.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GetFileInfomationByHandle.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GetFullPathName.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

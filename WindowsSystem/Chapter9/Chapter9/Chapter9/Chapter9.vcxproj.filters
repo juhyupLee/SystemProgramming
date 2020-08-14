@@ -24,5 +24,8 @@
     <ClCompile Include="BELOW_NORMAL_PRIORITY_CLASS.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="MyTest.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

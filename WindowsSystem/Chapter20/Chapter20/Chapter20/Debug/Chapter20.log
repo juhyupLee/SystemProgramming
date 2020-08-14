@@ -1,2 +1,4 @@
-﻿  MemoryMappedFileSort.cpp
+﻿  DynamicArray.cpp
+C:\SideProject\SystemProgramming\WindowsSystem\Chapter20\Chapter20\Chapter20\DynamicArray.cpp(37,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\SideProject\SystemProgramming\WindowsSystem\Chapter20\Chapter20\Chapter20\DynamicArray.cpp(50,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
   Chapter20.vcxproj -> C:\SideProject\SystemProgramming\WindowsSystem\Chapter20\Chapter20\Debug\Chapter20.exe
