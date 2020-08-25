@@ -1,4 +1,4 @@
-#define _WIN32_WINNT0x0400
+//#define _WIN32_WINNT0x0400
 
 #include <stdio.h>
 #include <tchar.h>
@@ -7,7 +7,7 @@
 int _tmain()
 {
 	HANDLE hTimer = NULL;
-	long long liDueTime=-10000000;
+	long long liDueTime=-100000000;
 
 	hTimer = CreateWaitableTimer(NULL, FALSE, NULL);
 	if (!hTimer)

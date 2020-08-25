@@ -18,7 +18,7 @@ int _tmain()
 
 	hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	//hMutex = CreateMutex(NULL, FALSE, NULL);
+	hMutex = CreateMutex(NULL, FALSE, NULL);
 
 	if (hEvent == NULL)
 	{
@@ -71,12 +71,12 @@ unsigned int WINAPI OutputThreadFunction(LPVOID lpParam)
 
 unsigned int WINAPI CountThreadFunction(LPVOID lpParam)
 {
-	static bool binit = true;
-	if (binit)
-	{
-		hMutex = CreateMutex(NULL, TRUE, NULL);
-		binit = false;
-	}
+	//static bool binit = true;
+	//if (binit)
+	//{
+	//	hMutex = CreateMutex(NULL, TRUE, NULL);
+	//	binit = false;
+	//}
 	WaitForSingleObject(hEvent, INFINITE);
 	WaitForSingleObject(hMutex, INFINITE);
 	_tprintf(_T("output string length: %d\n"), _tcslen(string) - 1);
